@@ -1,0 +1,2606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShopSync | E-Shop Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4cc9f0;
+            --success-color: #4ade80;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --light-color: #f8f9fa;
+            --dark-color: #1e293b;
+            --gray-color: #6b7280;
+            --sidebar-width: 260px;
+            --header-height: 70px;
+            --transition-speed: 0.3s;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fb;
+            color: var(--dark-color);
+            overflow-x: hidden;
+        }
+        
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            position: fixed;
+            height: 100vh;
+            transition: all var(--transition-speed);
+            z-index: 100;
+            box-shadow: 3px 0 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo-icon {
+            font-size: 28px;
+            color: var(--accent-color);
+        }
+        
+        .logo-text {
+            font-size: 22px;
+            font-weight: 700;
+        }
+        
+        .sidebar-menu {
+            padding: 20px 0;
+            overflow-y: auto;
+            height: calc(100vh - 120px);
+        }
+        
+        .menu-item {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 4px solid transparent;
+        }
+        
+        .menu-item:hover, .menu-item.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left-color: var(--accent-color);
+        }
+        
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+        }
+        
+        .user-profile {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            transition: all var(--transition-speed);
+        }
+        
+        .header {
+            height: var(--header-height);
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            position: sticky;
+            top: 0;
+            z-index: 99;
+        }
+        
+        .header-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .notification {
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--danger-color);
+            color: white;
+            font-size: 10px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .content-wrapper {
+            padding: 30px;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Dashboard Cards */
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-icon {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+        
+        .card-icon.blue { background-color: var(--primary-color); }
+        .card-icon.green { background-color: var(--success-color); }
+        .card-icon.orange { background-color: var(--warning-color); }
+        .card-icon.red { background-color: var(--danger-color); }
+        
+        .card-title {
+            font-size: 14px;
+            color: var(--gray-color);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .card-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 5px;
+        }
+        
+        .card-change {
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .card-change.positive { color: var(--success-color); }
+        .card-change.negative { color: var(--danger-color); }
+        
+        /* Chart Container */
+        .chart-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--dark-color);
+        }
+        
+        /* Table Styles */
+        .table-container {
+            background-color: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+        
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .table-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: white;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            text-align: left;
+            padding: 15px;
+            background-color: #f8fafc;
+            color: var(--gray-color);
+            font-weight: 600;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        tr:hover {
+            background-color: #f9fafb;
+        }
+        
+        .status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status.pending {
+            background-color: #fef3c7;
+            color: #d97706;
+        }
+        
+        .status.completed {
+            background-color: #d1fae5;
+            color: #059669;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+        }
+        
+        /* Form Styles */
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        /* Invoice Styles */
+        .invoice-container {
+            background-color: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 20px;
+        }
+        
+        .invoice-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .invoice-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .invoice-items {
+            margin-bottom: 30px;
+        }
+        
+        .invoice-totals {
+            background-color: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .total-row.final {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            animation: modalFadeIn 0.3s;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+        
+        .close-modal {
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray-color);
+        }
+        
+        /* Footer */
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            padding: 20px;
+            color: var(--gray-color);
+            font-size: 14px;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .chart-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .header {
+                padding: 0 20px;
+            }
+            
+            .menu-toggle {
+                display: block;
+                font-size: 24px;
+                cursor: pointer;
+                color: var(--primary-color);
+            }
+            
+            .content-wrapper {
+                padding: 20px;
+            }
+            
+            .dashboard-cards {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .invoice-details {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Page-specific styles */
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        /* Animation for page transitions */
+        @keyframes slideInRight {
+            from { transform: translateX(20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .page.active {
+            animation: slideInRight 0.3s ease-out;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--gray-color);
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Sale product selection */
+        .product-selection {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: end;
+        }
+        
+        .remove-item {
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            width: 35px;
+            height: 35px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <div class="logo-text">ShopSync</div>
+                </div>
+            </div>
+            
+            <div class="sidebar-menu">
+                <div class="menu-item active" data-page="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </div>
+                <div class="menu-item" data-page="employees">
+                    <i class="fas fa-users"></i>
+                    <span>Employees</span>
+                </div>
+                <div class="menu-item" data-page="categories">
+                    <i class="fas fa-tags"></i>
+                    <span>Categories</span>
+                </div>
+                <div class="menu-item" data-page="products">
+                    <i class="fas fa-box"></i>
+                    <span>Products</span>
+                </div>
+                <div class="menu-item" data-page="sales">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Sales</span>
+                </div>
+                <div class="menu-item" data-page="transactions">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Transactions</span>
+                </div>
+                <div class="menu-item" data-page="analytics">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Analytics</span>
+                </div>
+                <div class="menu-item" data-page="reports">
+                    <i class="fas fa-file-invoice"></i>
+                    <span>Reports</span>
+                </div>
+            </div>
+            
+            <div class="user-profile">
+                <div class="user-avatar">A</div>
+                <div>
+                    <div class="user-name">Admin User</div>
+                    <div class="user-role">Administrator</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <div class="menu-toggle" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </div>
+                <div class="header-title" id="pageTitle">Dashboard</div>
+                <div class="header-actions">
+                    <div class="notification">
+                        <i class="fas fa-bell"></i>
+                        <div class="notification-badge">3</div>
+                    </div>
+                    <div class="user">
+                        <i class="fas fa-user-circle" style="font-size: 28px; color: var(--primary-color);"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Content Wrapper -->
+            <div class="content-wrapper">
+                <!-- Dashboard Page -->
+                <div class="page active" id="dashboard">
+                    <h1 style="margin-bottom: 20px; color: var(--primary-color);">Dashboard Overview</h1>
+                    
+                    <div class="dashboard-cards">
+                        <div class="card">
+                            <div class="card-title">Total Products</div>
+                            <div class="card-value">142</div>
+                            <div class="card-change positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>12% from last month</span>
+                            </div>
+                            <div class="card-icon blue">
+                                <i class="fas fa-box"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-title">Total Sales</div>
+                            <div class="card-value">₹1,24,850</div>
+                            <div class="card-change positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>8% from last month</span>
+                            </div>
+                            <div class="card-icon green">
+                                <i class="fas fa-rupee-sign"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-title">Pending Payments</div>
+                            <div class="card-value">₹24,500</div>
+                            <div class="card-change negative">
+                                <i class="fas fa-arrow-down"></i>
+                                <span>3% from last month</span>
+                            </div>
+                            <div class="card-icon orange">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-title">Total Profit</div>
+                            <div class="card-value">₹45,620</div>
+                            <div class="card-change positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>15% from last month</span>
+                            </div>
+                            <div class="card-icon red">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <div class="chart-card">
+                            <div class="chart-title">Sales Analytics (Last 7 Days)</div>
+                            <canvas id="salesChart"></canvas>
+                        </div>
+                        
+                        <div class="chart-card">
+                            <div class="chart-title">Product Categories</div>
+                            <canvas id="categoryChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container">
+                        <div class="table-header">
+                            <div class="table-title">Recent Transactions</div>
+                            <button class="btn btn-primary" onclick="showPage('transactions')">
+                                <i class="fas fa-eye"></i> View All
+                            </button>
+                        </div>
+                        
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Transaction ID</th>
+                                    <th>Customer</th>
+                                    <th>Date</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>#TX-7821</td>
+                                    <td>Rahul Sharma</td>
+                                    <td>12 May 2023</td>
+                                    <td>₹8,450</td>
+                                    <td><span class="status completed">Completed</span></td>
+                                </tr>
+                                <tr>
+                                    <td>#TX-7820</td>
+                                    <td>Priya Patel</td>
+                                    <td>11 May 2023</td>
+                                    <td>₹12,500</td>
+                                    <td><span class="status pending">Pending</span></td>
+                                </tr>
+                                <tr>
+                                    <td>#TX-7819</td>
+                                    <td>Anil Kumar</td>
+                                    <td>10 May 2023</td>
+                                    <td>₹5,250</td>
+                                    <td><span class="status completed">Completed</span></td>
+                                </tr>
+                                <tr>
+                                    <td>#TX-7818</td>
+                                    <td>Sneha Singh</td>
+                                    <td>9 May 2023</td>
+                                    <td>₹9,800</td>
+                                    <td><span class="status completed">Completed</span></td>
+                                </tr>
+                                <tr>
+                                    <td>#TX-7817</td>
+                                    <td>Vikram Mehta</td>
+                                    <td>8 May 2023</td>
+                                    <td>₹15,200</td>
+                                    <td><span class="status pending">Pending</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Employees Page -->
+                <div class="page" id="employees">
+                    <div class="table-header">
+                        <div class="table-title">Employee Management</div>
+                        <button class="btn btn-primary" id="addEmployeeBtn">
+                            <i class="fas fa-plus"></i> Add Employee
+                        </button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Employee ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Join Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="employeeTableBody">
+                                <!-- Employee data will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Categories Page -->
+                <div class="page" id="categories">
+                    <div class="table-header">
+                        <div class="table-title">Product Categories</div>
+                        <button class="btn btn-primary" id="addCategoryBtn">
+                            <i class="fas fa-plus"></i> Add Category
+                        </button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Category ID</th>
+                                    <th>Category Name</th>
+                                    <th>Description</th>
+                                    <th>No. of Products</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="categoryTableBody">
+                                <!-- Category data will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Products Page -->
+                <div class="page" id="products">
+                    <div class="tabs">
+                        <div class="tab active" data-tab="product-list">Product List</div>
+                        <div class="tab" data-tab="add-product">Add Product</div>
+                    </div>
+                    
+                    <div class="tab-content active" id="product-list">
+                        <div class="table-header">
+                            <div class="table-title">All Products</div>
+                            <button class="btn btn-primary" onclick="switchTab('add-product')">
+                                <i class="fas fa-plus"></i> Add Product
+                            </button>
+                        </div>
+                        
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Product ID</th>
+                                        <th>Product Name</th>
+                                        <th>Category</th>
+                                        <th>Price</th>
+                                        <th>Quantity</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="productTableBody">
+                                    <!-- Product data will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="add-product">
+                        <div class="form-container">
+                            <h2 style="margin-bottom: 25px; color: var(--primary-color);">Add New Product</h2>
+                            <form id="productForm">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="productName">Product Name</label>
+                                        <input type="text" id="productName" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="productCategory">Category</label>
+                                        <select id="productCategory" required>
+                                            <option value="">Select Category</option>
+                                            <!-- Categories will be populated by JavaScript -->
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="productPrice">Price (₹)</label>
+                                        <input type="number" id="productPrice" min="1" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="productQuantity">Quantity</label>
+                                        <input type="number" id="productQuantity" min="0" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="productDescription">Description</label>
+                                    <textarea id="productDescription" rows="3"></textarea>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="productProperties">Product Properties (JSON format)</label>
+                                    <textarea id="productProperties" rows="4" placeholder='{"color": "red", "size": "M", "brand": "Nike"}'></textarea>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 15px;">
+                                    <i class="fas fa-save"></i> Save Product
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sales Page -->
+                <div class="page" id="sales">
+                    <div class="form-container">
+                        <h2 style="margin-bottom: 25px; color: var(--primary-color);">Create New Sale</h2>
+                        
+                        <div class="form-group">
+                            <label for="customerName">Customer Name</label>
+                            <input type="text" id="customerName" placeholder="Enter customer name">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="customerPhone">Customer Phone</label>
+                            <input type="text" id="customerPhone" placeholder="Enter customer phone">
+                        </div>
+                        
+                        <h3 style="margin: 20px 0 15px; color: var(--dark-color);">Products</h3>
+                        
+                        <div id="saleProductsContainer">
+                            <!-- Product selection rows will be added here -->
+                        </div>
+                        
+                        <button class="btn btn-primary" id="addProductRowBtn" style="margin-bottom: 20px;">
+                            <i class="fas fa-plus"></i> Add Product
+                        </button>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Payment Status</label>
+                                <select id="paymentStatus">
+                                    <option value="paid">Paid</option>
+                                    <option value="pending">Pending</option>
+                                </select>
+                            </div>
+                            <div class="form-group" id="pendingDateContainer" style="display: none;">
+                                <label for="pendingDate">Payment Due Date</label>
+                                <input type="date" id="pendingDate">
+                            </div>
+                        </div>
+                        
+                        <div class="invoice-totals" style="margin-top: 30px;">
+                            <div class="total-row">
+                                <span>Subtotal:</span>
+                                <span id="subtotalAmount">₹0.00</span>
+                            </div>
+                            <div class="total-row">
+                                <span>CGST (9%):</span>
+                                <span id="cgstAmount">₹0.00</span>
+                            </div>
+                            <div class="total-row">
+                                <span>SGST (9%):</span>
+                                <span id="sgstAmount">₹0.00</span>
+                            </div>
+                            <div class="total-row final">
+                                <span>Total Amount:</span>
+                                <span id="totalAmount">₹0.00</span>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 15px; margin-top: 30px;">
+                            <button class="btn btn-success" id="processSaleBtn" style="flex: 1;">
+                                <i class="fas fa-check"></i> Process Sale
+                            </button>
+                            <button class="btn btn-primary" id="generateInvoiceBtn" style="flex: 1;">
+                                <i class="fas fa-file-pdf"></i> Generate Invoice
+                            </button>
+                            <button class="btn btn-warning" id="printInvoiceBtn" style="flex: 1;">
+                                <i class="fas fa-print"></i> Print Invoice
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Transactions Page -->
+                <div class="page" id="transactions">
+                    <div class="tabs">
+                        <div class="tab active" data-tab="all-transactions">All Transactions</div>
+                        <div class="tab" data-tab="pending-transactions">Pending Payments</div>
+                        <div class="tab" data-tab="completed-transactions">Completed Payments</div>
+                    </div>
+                    
+                    <div class="tab-content active" id="all-transactions">
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Transaction ID</th>
+                                        <th>Customer</th>
+                                        <th>Date</th>
+                                        <th>Products</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="allTransactionsBody">
+                                    <!-- Transactions will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="pending-transactions">
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Transaction ID</th>
+                                        <th>Customer</th>
+                                        <th>Date</th>
+                                        <th>Due Date</th>
+                                        <th>Amount</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pendingTransactionsBody">
+                                    <!-- Pending transactions will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="completed-transactions">
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Transaction ID</th>
+                                        <th>Customer</th>
+                                        <th>Date</th>
+                                        <th>Amount</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="completedTransactionsBody">
+                                    <!-- Completed transactions will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Analytics Page -->
+                <div class="page" id="analytics">
+                    <h1 style="margin-bottom: 20px; color: var(--primary-color);">Sales Analytics</h1>
+                    
+                    <div class="dashboard-cards">
+                        <div class="card">
+                            <div class="card-title">Today's Sales</div>
+                            <div class="card-value">₹8,450</div>
+                            <div class="card-change positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>12% from yesterday</span>
+                            </div>
+                            <div class="card-icon blue">
+                                <i class="fas fa-calendar-day"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-title">This Week's Sales</div>
+                            <div class="card-value">₹64,320</div>
+                            <div class="card-change positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>8% from last week</span>
+                            </div>
+                            <div class="card-icon green">
+                                <i class="fas fa-calendar-week"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-title">This Month's Sales</div>
+                            <div class="card-value">₹2,45,800</div>
+                            <div class="card-change negative">
+                                <i class="fas fa-arrow-down"></i>
+                                <span>3% from last month</span>
+                            </div>
+                            <div class="card-icon orange">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-title">Total Profit</div>
+                            <div class="card-value">₹89,450</div>
+                            <div class="card-change positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>15% from last month</span>
+                            </div>
+                            <div class="card-icon red">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <div class="chart-card">
+                            <div class="chart-title">Monthly Sales Trend</div>
+                            <canvas id="monthlySalesChart"></canvas>
+                        </div>
+                        
+                        <div class="chart-card">
+                            <div class="chart-title">Payment Status Distribution</div>
+                            <canvas id="paymentChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <div class="chart-card">
+                            <div class="chart-title">Top Selling Products</div>
+                            <canvas id="topProductsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Reports Page -->
+                <div class="page" id="reports">
+                    <div class="form-container">
+                        <h2 style="margin-bottom: 25px; color: var(--primary-color);">Generate Reports</h2>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="reportType">Report Type</label>
+                                <select id="reportType">
+                                    <option value="sales">Sales Report</option>
+                                    <option value="inventory">Inventory Report</option>
+                                    <option value="transactions">Transaction Report</option>
+                                    <option value="profit">Profit & Loss Report</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="reportPeriod">Period</label>
+                                <select id="reportPeriod">
+                                    <option value="today">Today</option>
+                                    <option value="week">This Week</option>
+                                    <option value="month">This Month</option>
+                                    <option value="quarter">This Quarter</option>
+                                    <option value="year">This Year</option>
+                                    <option value="custom">Custom Range</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row" id="customDateRange" style="display: none;">
+                            <div class="form-group">
+                                <label for="startDate">Start Date</label>
+                                <input type="date" id="startDate">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="endDate">End Date</label>
+                                <input type="date" id="endDate">
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 15px; margin-top: 30px;">
+                            <button class="btn btn-primary" id="generateReportBtn" style="flex: 1;">
+                                <i class="fas fa-chart-bar"></i> Generate Report
+                            </button>
+                            <button class="btn btn-success" id="exportReportBtn" style="flex: 1;">
+                                <i class="fas fa-file-excel"></i> Export to Excel
+                            </button>
+                            <button class="btn btn-warning" id="printReportBtn" style="flex: 1;">
+                                <i class="fas fa-print"></i> Print Report
+                            </button>
+                        </div>
+                        
+                        <div id="reportPreview" style="margin-top: 40px; display: none;">
+                            <div class="table-container">
+                                <div class="table-header">
+                                    <div class="table-title" id="reportTitle">Sales Report</div>
+                                </div>
+                                <table id="reportTable">
+                                    <!-- Report data will be populated by JavaScript -->
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Footer -->
+                <div class="footer">
+                    <p>ShopSync - E-Shop Management System © 2023. All rights reserved.</p>
+                    <p>Designed for admin and employee collaboration in retail management</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modals -->
+    <div class="modal" id="employeeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="employeeModalTitle">Add Employee</div>
+                <div class="close-modal" onclick="closeModal('employeeModal')">&times;</div>
+            </div>
+            <form id="employeeForm">
+                <div class="form-group">
+                    <label for="empName">Full Name</label>
+                    <input type="text" id="empName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="empEmail">Email Address</label>
+                    <input type="email" id="empEmail" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="empRole">Role</label>
+                        <select id="empRole" required>
+                            <option value="admin">Admin</option>
+                            <option value="employee">Employee</option>
+                            <option value="manager">Manager</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="empPhone">Phone Number</label>
+                        <input type="text" id="empPhone" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="empAddress">Address</label>
+                    <textarea id="empAddress" rows="2"></textarea>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 15px;">
+                    <i class="fas fa-save"></i> Save Employee
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="modal" id="categoryModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="categoryModalTitle">Add Category</div>
+                <div class="close-modal" onclick="closeModal('categoryModal')">&times;</div>
+            </div>
+            <form id="categoryForm">
+                <div class="form-group">
+                    <label for="catName">Category Name</label>
+                    <input type="text" id="catName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="catDescription">Description</label>
+                    <textarea id="catDescription" rows="3"></textarea>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 15px;">
+                    <i class="fas fa-save"></i> Save Category
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="modal" id="invoiceModal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <div class="modal-title">Invoice Preview</div>
+                <div class="close-modal" onclick="closeModal('invoiceModal')">&times;</div>
+            </div>
+            <div id="invoiceContent">
+                <!-- Invoice content will be generated by JavaScript -->
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-primary" id="printInvoiceModalBtn" style="flex: 1;">
+                    <i class="fas fa-print"></i> Print Invoice
+                </button>
+                <button class="btn btn-success" id="downloadInvoiceBtn" style="flex: 1;">
+                    <i class="fas fa-download"></i> Download PDF
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        // Global variables
+        let currentEmployeeId = null;
+        let currentCategoryId = null;
+        let currentProductId = null;
+        let saleProducts = [];
+        let saleTotal = 0;
+        
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize sidebar menu
+            initSidebar();
+            
+            // Initialize charts
+            initCharts();
+            
+            // Initialize data tables
+            initEmployeeTable();
+            initCategoryTable();
+            initProductTable();
+            initTransactionTables();
+            
+            // Initialize sales page
+            initSalesPage();
+            
+            // Initialize modals
+            initModals();
+            
+            // Initialize tabs
+            initTabs();
+            
+            // Set current date for pending payment
+            document.getElementById('pendingDate').valueAsDate = new Date();
+        });
+        
+        // Initialize sidebar menu
+        function initSidebar() {
+            const menuItems = document.querySelectorAll('.menu-item');
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.getElementById('sidebar');
+            
+            menuItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // Remove active class from all items
+                    menuItems.forEach(i => i.classList.remove('active'));
+                    
+                    // Add active class to clicked item
+                    this.classList.add('active');
+                    
+                    // Get page id from data attribute
+                    const pageId = this.getAttribute('data-page');
+                    
+                    // Show the corresponding page
+                    showPage(pageId);
+                });
+            });
+            
+            // Toggle sidebar on mobile
+            menuToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('active');
+            });
+        }
+        
+        // Initialize charts
+        function initCharts() {
+            // Sales Chart
+            const salesCtx = document.getElementById('salesChart').getContext('2d');
+            const salesChart = new Chart(salesCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Sales (₹)',
+                        data: [12000, 19000, 15000, 25000, 22000, 30000, 28000],
+                        borderColor: '#4361ee',
+                        backgroundColor: 'rgba(67, 97, 238, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '₹' + value;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Category Chart
+            const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+            const categoryChart = new Chart(categoryCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Electronics', 'Clothing', 'Home & Kitchen', 'Books', 'Beauty'],
+                    datasets: [{
+                        data: [30, 25, 20, 15, 10],
+                        backgroundColor: [
+                            '#4361ee',
+                            '#4cc9f0',
+                            '#7209b7',
+                            '#f72585',
+                            '#4ade80'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    }
+                }
+            });
+            
+            // Monthly Sales Chart
+            const monthlySalesCtx = document.getElementById('monthlySalesChart').getContext('2d');
+            const monthlySalesChart = new Chart(monthlySalesCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    datasets: [{
+                        label: 'Sales (₹)',
+                        data: [85000, 92000, 78000, 95000, 110000, 125000, 135000, 142000, 128000, 115000, 105000, 98000],
+                        backgroundColor: '#4361ee',
+                        borderColor: '#3f37c9',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '₹' + value;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Payment Chart
+            const paymentCtx = document.getElementById('paymentChart').getContext('2d');
+            const paymentChart = new Chart(paymentCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['Paid', 'Pending'],
+                    datasets: [{
+                        data: [85, 15],
+                        backgroundColor: [
+                            '#4ade80',
+                            '#f59e0b'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    }
+                }
+            });
+            
+            // Top Products Chart
+            const topProductsCtx = document.getElementById('topProductsChart').getContext('2d');
+            const topProductsChart = new Chart(topProductsCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Laptop', 'Smartphone', 'Headphones', 'Tablet', 'Smartwatch'],
+                    datasets: [{
+                        label: 'Units Sold',
+                        data: [45, 78, 56, 34, 67],
+                        backgroundColor: '#4cc9f0',
+                        borderColor: '#3f37c9',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Initialize employee table
+        function initEmployeeTable() {
+            const employees = [
+                {id: 1, name: "Rajesh Kumar", email: "rajesh@shopsync.com", role: "Admin", joinDate: "15 Jan 2022", status: "Active"},
+                {id: 2, name: "Priya Sharma", email: "priya@shopsync.com", role: "Employee", joinDate: "20 Mar 2022", status: "Active"},
+                {id: 3, name: "Amit Patel", email: "amit@shopsync.com", role: "Employee", joinDate: "10 May 2022", status: "Active"},
+                {id: 4, name: "Sneha Singh", email: "sneha@shopsync.com", role: "Manager", joinDate: "05 Aug 2022", status: "Active"},
+                {id: 5, name: "Vikram Mehta", email: "vikram@shopsync.com", role: "Employee", joinDate: "12 Nov 2022", status: "Inactive"}
+            ];
+            
+            const tableBody = document.getElementById('employeeTableBody');
+            tableBody.innerHTML = '';
+            
+            employees.forEach(emp => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>EMP-${emp.id.toString().padStart(4, '0')}</td>
+                    <td>${emp.name}</td>
+                    <td>${emp.email}</td>
+                    <td>${emp.role}</td>
+                    <td>${emp.joinDate}</td>
+                    <td><span class="status ${emp.status === 'Active' ? 'completed' : 'pending'}">${emp.status}</span></td>
+                    <td>
+                        <div class="action-buttons">
+                            <div class="action-btn" style="background-color: #3b82f6;" onclick="editEmployee(${emp.id})">
+                                <i class="fas fa-edit"></i>
+                            </div>
+                            <div class="action-btn" style="background-color: #ef4444;" onclick="deleteEmployee(${emp.id})">
+                                <i class="fas fa-trash"></i>
+                            </div>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // Initialize category table
+        function initCategoryTable() {
+            const categories = [
+                {id: 1, name: "Electronics", description: "Electronic devices and accessories", productCount: 42},
+                {id: 2, name: "Clothing", description: "Men's and women's clothing", productCount: 35},
+                {id: 3, name: "Home & Kitchen", description: "Home appliances and kitchenware", productCount: 28},
+                {id: 4, name: "Books", description: "Books and stationery", productCount: 15},
+                {id: 5, name: "Beauty", description: "Beauty and personal care products", productCount: 22}
+            ];
+            
+            const tableBody = document.getElementById('categoryTableBody');
+            const categorySelect = document.getElementById('productCategory');
+            
+            // Clear existing options except the first one
+            while (categorySelect.options.length > 1) {
+                categorySelect.remove(1);
+            }
+            
+            tableBody.innerHTML = '';
+            
+            categories.forEach(cat => {
+                // Add to table
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>CAT-${cat.id.toString().padStart(4, '0')}</td>
+                    <td>${cat.name}</td>
+                    <td>${cat.description}</td>
+                    <td>${cat.productCount}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <div class="action-btn" style="background-color: #3b82f6;" onclick="editCategory(${cat.id})">
+                                <i class="fas fa-edit"></i>
+                            </div>
+                            <div class="action-btn" style="background-color: #ef4444;" onclick="deleteCategory(${cat.id})">
+                                <i class="fas fa-trash"></i>
+                            </div>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+                
+                // Add to product form dropdown
+                const option = document.createElement('option');
+                option.value = cat.id;
+                option.textContent = cat.name;
+                categorySelect.appendChild(option);
+            });
+        }
+        
+        // Initialize product table
+        function initProductTable() {
+            const products = [
+                {id: 1, name: "Laptop Dell XPS 13", category: "Electronics", price: 85000, quantity: 12, status: "In Stock"},
+                {id: 2, name: "Wireless Headphones", category: "Electronics", price: 3500, quantity: 25, status: "In Stock"},
+                {id: 3, name: "Men's Casual Shirt", category: "Clothing", price: 1200, quantity: 45, status: "In Stock"},
+                {id: 4, name: "Kitchen Blender", category: "Home & Kitchen", price: 2500, quantity: 8, status: "Low Stock"},
+                {id: 5, name: "JavaScript Book", category: "Books", price: 450, quantity: 32, status: "In Stock"}
+            ];
+            
+            const tableBody = document.getElementById('productTableBody');
+            tableBody.innerHTML = '';
+            
+            products.forEach(prod => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>PROD-${prod.id.toString().padStart(4, '0')}</td>
+                    <td>${prod.name}</td>
+                    <td>${prod.category}</td>
+                    <td>₹${prod.price.toLocaleString()}</td>
+                    <td>${prod.quantity}</td>
+                    <td><span class="status ${prod.status === 'In Stock' ? 'completed' : prod.status === 'Low Stock' ? 'pending' : 'pending'}">${prod.status}</span></td>
+                    <td>
+                        <div class="action-buttons">
+                            <div class="action-btn" style="background-color: #3b82f6;" onclick="editProduct(${prod.id})">
+                                <i class="fas fa-edit"></i>
+                            </div>
+                            <div class="action-btn" style="background-color: #ef4444;" onclick="deleteProduct(${prod.id})">
+                                <i class="fas fa-trash"></i>
+                            </div>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // Initialize transaction tables
+        function initTransactionTables() {
+            const transactions = [
+                {id: 1, customer: "Rahul Sharma", date: "12 May 2023", products: "Laptop, Headphones", amount: 8450, status: "completed"},
+                {id: 2, customer: "Priya Patel", date: "11 May 2023", products: "Shirt, Blender", amount: 12500, status: "pending"},
+                {id: 3, customer: "Anil Kumar", date: "10 May 2023", products: "JavaScript Book", amount: 5250, status: "completed"},
+                {id: 4, customer: "Sneha Singh", date: "9 May 2023", products: "Headphones, Shirt", amount: 9800, status: "completed"},
+                {id: 5, customer: "Vikram Mehta", date: "8 May 2023", products: "Laptop", amount: 15200, status: "pending"}
+            ];
+            
+            const allTableBody = document.getElementById('allTransactionsBody');
+            const pendingTableBody = document.getElementById('pendingTransactionsBody');
+            const completedTableBody = document.getElementById('completedTransactionsBody');
+            
+            allTableBody.innerHTML = '';
+            pendingTableBody.innerHTML = '';
+            completedTableBody.innerHTML = '';
+            
+            transactions.forEach(trans => {
+                // All transactions table
+                const allRow = document.createElement('tr');
+                allRow.innerHTML = `
+                    <td>#TX-${trans.id.toString().padStart(4, '0')}</td>
+                    <td>${trans.customer}</td>
+                    <td>${trans.date}</td>
+                    <td>${trans.products}</td>
+                    <td>₹${trans.amount.toLocaleString()}</td>
+                    <td><span class="status ${trans.status}">${trans.status === 'completed' ? 'Completed' : 'Pending'}</span></td>
+                    <td>
+                        <div class="action-buttons">
+                            <div class="action-btn" style="background-color: #3b82f6;" onclick="viewTransaction(${trans.id})">
+                                <i class="fas fa-eye"></i>
+                            </div>
+                            <div class="action-btn" style="background-color: #10b981;" onclick="markAsPaid(${trans.id})">
+                                <i class="fas fa-check"></i>
+                            </div>
+                        </div>
+                    </td>
+                `;
+                allTableBody.appendChild(allRow);
+                
+                // Pending transactions table
+                if (trans.status === 'pending') {
+                    const pendingRow = document.createElement('tr');
+                    pendingRow.innerHTML = `
+                        <td>#TX-${trans.id.toString().padStart(4, '0')}</td>
+                        <td>${trans.customer}</td>
+                        <td>${trans.date}</td>
+                        <td>15 May 2023</td>
+                        <td>₹${trans.amount.toLocaleString()}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <div class="action-btn" style="background-color: #10b981;" onclick="markAsPaid(${trans.id})">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                            </div>
+                        </td>
+                    `;
+                    pendingTableBody.appendChild(pendingRow);
+                }
+                
+                // Completed transactions table
+                if (trans.status === 'completed') {
+                    const completedRow = document.createElement('tr');
+                    completedRow.innerHTML = `
+                        <td>#TX-${trans.id.toString().padStart(4, '0')}</td>
+                        <td>${trans.customer}</td>
+                        <td>${trans.date}</td>
+                        <td>₹${trans.amount.toLocaleString()}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <div class="action-btn" style="background-color: #3b82f6;" onclick="viewTransaction(${trans.id})">
+                                    <i class="fas fa-eye"></i>
+                                </div>
+                                <div class="action-btn" style="background-color: #f59e0b;" onclick="printTransaction(${trans.id})">
+                                    <i class="fas fa-print"></i>
+                                </div>
+                            </div>
+                        </td>
+                    `;
+                    completedTableBody.appendChild(completedRow);
+                }
+            });
+        }
+        
+        // Initialize sales page
+        function initSalesPage() {
+            const addProductBtn = document.getElementById('addProductRowBtn');
+            const paymentStatus = document.getElementById('paymentStatus');
+            const pendingDateContainer = document.getElementById('pendingDateContainer');
+            const processSaleBtn = document.getElementById('processSaleBtn');
+            const generateInvoiceBtn = document.getElementById('generateInvoiceBtn');
+            const printInvoiceBtn = document.getElementById('printInvoiceBtn');
+            
+            // Add product row button
+            addProductBtn.addEventListener('click', addProductRow);
+            
+            // Payment status change
+            paymentStatus.addEventListener('change', function() {
+                if (this.value === 'pending') {
+                    pendingDateContainer.style.display = 'block';
+                } else {
+                    pendingDateContainer.style.display = 'none';
+                }
+            });
+            
+            // Process sale button
+            processSaleBtn.addEventListener('click', processSale);
+            
+            // Generate invoice button
+            generateInvoiceBtn.addEventListener('click', generateInvoice);
+            
+            // Print invoice button
+            printInvoiceBtn.addEventListener('click', printInvoice);
+            
+            // Add initial product row
+            addProductRow();
+        }
+        
+        // Initialize modals
+        function initModals() {
+            // Employee modal
+            const addEmployeeBtn = document.getElementById('addEmployeeBtn');
+            const employeeForm = document.getElementById('employeeForm');
+            
+            addEmployeeBtn.addEventListener('click', function() {
+                document.getElementById('employeeModalTitle').textContent = 'Add Employee';
+                employeeForm.reset();
+                currentEmployeeId = null;
+                openModal('employeeModal');
+            });
+            
+            employeeForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveEmployee();
+            });
+            
+            // Category modal
+            const addCategoryBtn = document.getElementById('addCategoryBtn');
+            const categoryForm = document.getElementById('categoryForm');
+            
+            addCategoryBtn.addEventListener('click', function() {
+                document.getElementById('categoryModalTitle').textContent = 'Add Category';
+                categoryForm.reset();
+                currentCategoryId = null;
+                openModal('categoryModal');
+            });
+            
+            categoryForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveCategory();
+            });
+            
+            // Product form
+            const productForm = document.getElementById('productForm');
+            productForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveProduct();
+            });
+            
+            // Report period change
+            const reportPeriod = document.getElementById('reportPeriod');
+            const customDateRange = document.getElementById('customDateRange');
+            
+            reportPeriod.addEventListener('change', function() {
+                if (this.value === 'custom') {
+                    customDateRange.style.display = 'flex';
+                } else {
+                    customDateRange.style.display = 'none';
+                }
+            });
+            
+            // Generate report button
+            const generateReportBtn = document.getElementById('generateReportBtn');
+            generateReportBtn.addEventListener('click', generateReport);
+            
+            // Print report button
+            const printReportBtn = document.getElementById('printReportBtn');
+            printReportBtn.addEventListener('click', function() {
+                window.print();
+            });
+            
+            // Print invoice modal button
+            const printInvoiceModalBtn = document.getElementById('printInvoiceModalBtn');
+            printInvoiceModalBtn.addEventListener('click', function() {
+                const invoiceContent = document.getElementById('invoiceContent').innerHTML;
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(`
+                    <html>
+                    <head>
+                        <title>Invoice - ShopSync</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; padding: 20px; }
+                            .invoice-header { text-align: center; margin-bottom: 30px; }
+                            .invoice-title { font-size: 28px; font-weight: bold; color: #4361ee; }
+                            .invoice-details { display: flex; justify-content: space-between; margin-bottom: 30px; }
+                            table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+                            th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: left; }
+                            th { background-color: #f5f5f5; }
+                            .total-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
+                            .final { font-size: 18px; font-weight: bold; border-top: 2px solid #4361ee; padding-top: 10px; }
+                        </style>
+                    </head>
+                    <body>
+                        ${invoiceContent}
+                        <script>
+                            window.onload = function() {
+                                window.print();
+                            };
+                        <\/script>
+                    </body>
+                    </html>
+                `);
+                printWindow.document.close();
+            });
+        }
+        
+        // Initialize tabs
+        function initTabs() {
+            const tabs = document.querySelectorAll('.tab');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // Remove active class from all tabs
+                    tabs.forEach(t => t.classList.remove('active'));
+                    
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+                    
+                    // Hide all tab contents
+                    const tabContents = document.querySelectorAll('.tab-content');
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    // Show the corresponding tab content
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+        }
+        
+        // Show page function
+        function showPage(pageId) {
+            // Hide all pages
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => page.classList.remove('active'));
+            
+            // Show the selected page
+            document.getElementById(pageId).classList.add('active');
+            
+            // Update page title
+            const pageTitle = document.getElementById('pageTitle');
+            const pageTitles = {
+                dashboard: 'Dashboard',
+                employees: 'Employee Management',
+                categories: 'Product Categories',
+                products: 'Product Management',
+                sales: 'Sales Processing',
+                transactions: 'Transactions',
+                analytics: 'Analytics Dashboard',
+                reports: 'Reports'
+            };
+            
+            pageTitle.textContent = pageTitles[pageId] || 'ShopSync';
+            
+            // Close sidebar on mobile after selecting a page
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('active');
+            }
+        }
+        
+        // Switch tab function
+        function switchTab(tabId) {
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                if (tab.getAttribute('data-tab') === tabId) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+            
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => {
+                if (content.id === tabId) {
+                    content.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                }
+            });
+        }
+        
+        // Open modal function
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+        
+        // Close modal function
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        
+        // Employee functions
+        function editEmployee(id) {
+            currentEmployeeId = id;
+            document.getElementById('employeeModalTitle').textContent = 'Edit Employee';
+            
+            // In a real app, you would fetch employee data from the server
+            // For demo, we'll just populate with sample data
+            document.getElementById('empName').value = 'Rajesh Kumar';
+            document.getElementById('empEmail').value = 'rajesh@shopsync.com';
+            document.getElementById('empRole').value = 'admin';
+            document.getElementById('empPhone').value = '9876543210';
+            document.getElementById('empAddress').value = '123, Main Street, Mumbai';
+            
+            openModal('employeeModal');
+        }
+        
+        function deleteEmployee(id) {
+            if (confirm('Are you sure you want to delete this employee?')) {
+                alert(`Employee with ID ${id} deleted successfully!`);
+                // In a real app, you would make an API call to delete the employee
+                initEmployeeTable(); // Refresh the table
+            }
+        }
+        
+        function saveEmployee() {
+            const name = document.getElementById('empName').value;
+            const email = document.getElementById('empEmail').value;
+            const role = document.getElementById('empRole').value;
+            const phone = document.getElementById('empPhone').value;
+            
+            if (currentEmployeeId) {
+                alert(`Employee ${name} updated successfully!`);
+            } else {
+                alert(`Employee ${name} added successfully!`);
+            }
+            
+            closeModal('employeeModal');
+            initEmployeeTable(); // Refresh the table
+        }
+        
+        // Category functions
+        function editCategory(id) {
+            currentCategoryId = id;
+            document.getElementById('categoryModalTitle').textContent = 'Edit Category';
+            
+            // In a real app, you would fetch category data from the server
+            // For demo, we'll just populate with sample data
+            document.getElementById('catName').value = 'Electronics';
+            document.getElementById('catDescription').value = 'Electronic devices and accessories';
+            
+            openModal('categoryModal');
+        }
+        
+        function deleteCategory(id) {
+            if (confirm('Are you sure you want to delete this category?')) {
+                alert(`Category with ID ${id} deleted successfully!`);
+                // In a real app, you would make an API call to delete the category
+                initCategoryTable(); // Refresh the table
+            }
+        }
+        
+        function saveCategory() {
+            const name = document.getElementById('catName').value;
+            const description = document.getElementById('catDescription').value;
+            
+            if (currentCategoryId) {
+                alert(`Category ${name} updated successfully!`);
+            } else {
+                alert(`Category ${name} added successfully!`);
+            }
+            
+            closeModal('categoryModal');
+            initCategoryTable(); // Refresh the table
+        }
+        
+        // Product functions
+        function editProduct(id) {
+            currentProductId = id;
+            switchTab('add-product');
+            
+            // In a real app, you would fetch product data from the server
+            // For demo, we'll just populate with sample data
+            document.getElementById('productName').value = 'Laptop Dell XPS 13';
+            document.getElementById('productCategory').value = 1;
+            document.getElementById('productPrice').value = 85000;
+            document.getElementById('productQuantity').value = 12;
+            document.getElementById('productDescription').value = 'High-performance laptop with Intel i7 processor and 16GB RAM';
+            document.getElementById('productProperties').value = '{"brand": "Dell", "processor": "Intel i7", "ram": "16GB", "storage": "512GB SSD"}';
+        }
+        
+        function deleteProduct(id) {
+            if (confirm('Are you sure you want to delete this product?')) {
+                alert(`Product with ID ${id} deleted successfully!`);
+                // In a real app, you would make an API call to delete the product
+                initProductTable(); // Refresh the table
+            }
+        }
+        
+        function saveProduct() {
+            const name = document.getElementById('productName').value;
+            const category = document.getElementById('productCategory').value;
+            const price = document.getElementById('productPrice').value;
+            const quantity = document.getElementById('productQuantity').value;
+            
+            if (currentProductId) {
+                alert(`Product ${name} updated successfully!`);
+            } else {
+                alert(`Product ${name} added successfully!`);
+            }
+            
+            // Reset form
+            document.getElementById('productForm').reset();
+            currentProductId = null;
+            
+            // Switch back to product list
+            switchTab('product-list');
+            
+            // Refresh the table
+            initProductTable();
+        }
+        
+        // Sales functions
+        function addProductRow() {
+            const container = document.getElementById('saleProductsContainer');
+            const rowId = Date.now();
+            
+            const row = document.createElement('div');
+            row.className = 'product-selection';
+            row.id = `product-row-${rowId}`;
+            row.innerHTML = `
+                <div class="form-group">
+                    <label>Product</label>
+                    <select class="product-select" onchange="updateProductPrice(${rowId})">
+                        <option value="">Select Product</option>
+                        <option value="1">Laptop Dell XPS 13</option>
+                        <option value="2">Wireless Headphones</option>
+                        <option value="3">Men's Casual Shirt</option>
+                        <option value="4">Kitchen Blender</option>
+                        <option value="5">JavaScript Book</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Actual Price</label>
+                    <input type="text" class="actual-price" id="actual-price-${rowId}" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Sell Price (≥ Actual)</label>
+                    <input type="number" class="sell-price" id="sell-price-${rowId}" min="0" oninput="updateSaleTotal()">
+                </div>
+                <div class="form-group">
+                    <label>Quantity</label>
+                    <input type="number" class="product-quantity" id="quantity-${rowId}" min="1" value="1" oninput="updateSaleTotal()">
+                </div>
+                <div class="form-group">
+                    <label>Total</label>
+                    <input type="text" class="product-total" id="product-total-${rowId}" readonly>
+                </div>
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <button type="button" class="remove-item" onclick="removeProductRow(${rowId})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            
+            container.appendChild(row);
+        }
+        
+        function removeProductRow(rowId) {
+            const row = document.getElementById(`product-row-${rowId}`);
+            if (row) {
+                row.remove();
+                updateSaleTotal();
+            }
+        }
+        
+        function updateProductPrice(rowId) {
+            const productSelect = document.querySelector(`#product-row-${rowId} .product-select`);
+            const actualPriceInput = document.getElementById(`actual-price-${rowId}`);
+            const sellPriceInput = document.getElementById(`sell-price-${rowId}`);
+            
+            // Product prices (in a real app, these would come from a database)
+            const prices = {
+                '1': 85000,
+                '2': 3500,
+                '3': 1200,
+                '4': 2500,
+                '5': 450
+            };
+            
+            const selectedProduct = productSelect.value;
+            if (selectedProduct && prices[selectedProduct]) {
+                actualPriceInput.value = `₹${prices[selectedProduct].toLocaleString()}`;
+                sellPriceInput.value = prices[selectedProduct];
+                sellPriceInput.min = prices[selectedProduct];
+            } else {
+                actualPriceInput.value = '';
+                sellPriceInput.value = '';
+                sellPriceInput.min = 0;
+            }
+            
+            updateSaleTotal();
+        }
+        
+        function updateSaleTotal() {
+            let subtotal = 0;
+            saleProducts = [];
+            
+            // Get all product rows
+            const productRows = document.querySelectorAll('.product-selection');
+            
+            productRows.forEach(row => {
+                const rowId = row.id.split('-')[2];
+                const productSelect = document.querySelector(`#product-row-${rowId} .product-select`);
+                const sellPriceInput = document.getElementById(`sell-price-${rowId}`);
+                const quantityInput = document.getElementById(`quantity-${rowId}`);
+                const productTotalInput = document.getElementById(`product-total-${rowId}`);
+                
+                if (productSelect.value && sellPriceInput.value && quantityInput.value) {
+                    const productId = productSelect.value;
+                    const productName = productSelect.options[productSelect.selectedIndex].text;
+                    const sellPrice = parseFloat(sellPriceInput.value);
+                    const quantity = parseInt(quantityInput.value);
+                    const total = sellPrice * quantity;
+                    
+                    // Update product total field
+                    productTotalInput.value = `₹${total.toLocaleString()}`;
+                    
+                    // Add to subtotal
+                    subtotal += total;
+                    
+                    // Add to saleProducts array
+                    saleProducts.push({
+                        id: productId,
+                        name: productName,
+                        price: sellPrice,
+                        quantity: quantity,
+                        total: total
+                    });
+                }
+            });
+            
+            // Calculate taxes
+            const cgst = subtotal * 0.09;
+            const sgst = subtotal * 0.09;
+            const total = subtotal + cgst + sgst;
+            
+            // Update display
+            document.getElementById('subtotalAmount').textContent = `₹${subtotal.toLocaleString()}`;
+            document.getElementById('cgstAmount').textContent = `₹${cgst.toLocaleString()}`;
+            document.getElementById('sgstAmount').textContent = `₹${sgst.toLocaleString()}`;
+            document.getElementById('totalAmount').textContent = `₹${total.toLocaleString()}`;
+            
+            saleTotal = total;
+        }
+        
+        function processSale() {
+            const customerName = document.getElementById('customerName').value;
+            const customerPhone = document.getElementById('customerPhone').value;
+            const paymentStatus = document.getElementById('paymentStatus').value;
+            const pendingDate = document.getElementById('pendingDate').value;
+            
+            if (!customerName || !customerPhone) {
+                alert('Please enter customer details');
+                return;
+            }
+            
+            if (saleProducts.length === 0) {
+                alert('Please add at least one product to the sale');
+                return;
+            }
+            
+            // Check if any sell price is less than actual price
+            let priceError = false;
+            const productRows = document.querySelectorAll('.product-selection');
+            
+            productRows.forEach(row => {
+                const rowId = row.id.split('-')[2];
+                const actualPriceInput = document.getElementById(`actual-price-${rowId}`);
+                const sellPriceInput = document.getElementById(`sell-price-${rowId}`);
+                
+                if (actualPriceInput.value && sellPriceInput.value) {
+                    const actualPrice = parseInt(actualPriceInput.value.replace('₹', '').replace(/,/g, ''));
+                    const sellPrice = parseFloat(sellPriceInput.value);
+                    
+                    if (sellPrice < actualPrice) {
+                        priceError = true;
+                        alert(`Sell price for product in row ${rowId} is less than actual price. Please adjust.`);
+                    }
+                }
+            });
+            
+            if (priceError) return;
+            
+            // Process the sale
+            alert(`Sale processed successfully!\nCustomer: ${customerName}\nTotal Amount: ₹${saleTotal.toLocaleString()}\nPayment Status: ${paymentStatus}`);
+            
+            // Reset the form
+            document.getElementById('customerName').value = '';
+            document.getElementById('customerPhone').value = '';
+            document.getElementById('paymentStatus').value = 'paid';
+            document.getElementById('pendingDateContainer').style.display = 'none';
+            
+            // Clear product rows
+            document.getElementById('saleProductsContainer').innerHTML = '';
+            
+            // Add a new empty row
+            addProductRow();
+            
+            // Reset totals
+            document.getElementById('subtotalAmount').textContent = '₹0.00';
+            document.getElementById('cgstAmount').textContent = '₹0.00';
+            document.getElementById('sgstAmount').textContent = '₹0.00';
+            document.getElementById('totalAmount').textContent = '₹0.00';
+            
+            saleProducts = [];
+            saleTotal = 0;
+            
+            // Refresh transaction tables
+            initTransactionTables();
+        }
+        
+        function generateInvoice() {
+            const customerName = document.getElementById('customerName').value;
+            const customerPhone = document.getElementById('customerPhone').value;
+            const paymentStatus = document.getElementById('paymentStatus').value;
+            const pendingDate = document.getElementById('pendingDate').value;
+            
+            if (!customerName || !customerPhone) {
+                alert('Please enter customer details');
+                return;
+            }
+            
+            if (saleProducts.length === 0) {
+                alert('Please add at least one product to the sale');
+                return;
+            }
+            
+            // Generate invoice HTML
+            const invoiceId = 'INV-' + Date.now().toString().slice(-6);
+            const invoiceDate = new Date().toLocaleDateString('en-IN', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+            });
+            
+            let productsHtml = '';
+            saleProducts.forEach(product => {
+                productsHtml += `
+                    <tr>
+                        <td>${product.name}</td>
+                        <td>${product.quantity}</td>
+                        <td>₹${product.price.toLocaleString()}</td>
+                        <td>₹${product.total.toLocaleString()}</td>
+                    </tr>
+                `;
+            });
+            
+            const subtotal = saleTotal / 1.18;
+            const cgst = subtotal * 0.09;
+            const sgst = subtotal * 0.09;
+            
+            const invoiceHtml = `
+                <div class="invoice-header">
+                    <div class="invoice-title">INVOICE</div>
+                    <div>
+                        <div><strong>Invoice No:</strong> ${invoiceId}</div>
+                        <div><strong>Date:</strong> ${invoiceDate}</div>
+                    </div>
+                </div>
+                
+                <div class="invoice-details">
+                    <div>
+                        <h3>ShopSync</h3>
+                        <p>123, Business Street</p>
+                        <p>Mumbai, Maharashtra 400001</p>
+                        <p>GSTIN: 27ABCDE1234F1Z5</p>
+                    </div>
+                    <div>
+                        <h3>Customer Details</h3>
+                        <p><strong>Name:</strong> ${customerName}</p>
+                        <p><strong>Phone:</strong> ${customerPhone}</p>
+                        <p><strong>Payment Status:</strong> ${paymentStatus === 'paid' ? 'Paid' : 'Pending'}</p>
+                        ${paymentStatus === 'pending' ? `<p><strong>Due Date:</strong> ${pendingDate}</p>` : ''}
+                    </div>
+                </div>
+                
+                <div class="invoice-items">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${productsHtml}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="invoice-totals">
+                    <div class="total-row">
+                        <span>Subtotal:</span>
+                        <span>₹${subtotal.toLocaleString()}</span>
+                    </div>
+                    <div class="total-row">
+                        <span>CGST (9%):</span>
+                        <span>₹${cgst.toLocaleString()}</span>
+                    </div>
+                    <div class="total-row">
+                        <span>SGST (9%):</span>
+                        <span>₹${sgst.toLocaleString()}</span>
+                    </div>
+                    <div class="total-row final">
+                        <span>Total Amount:</span>
+                        <span>₹${saleTotal.toLocaleString()}</span>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 40px; text-align: center; color: #6b7280; font-size: 14px;">
+                    <p>Thank you for your business!</p>
+                    <p>This is a computer-generated invoice and does not require a signature.</p>
+                </div>
+            `;
+            
+            // Display invoice in modal
+            document.getElementById('invoiceContent').innerHTML = invoiceHtml;
+            openModal('invoiceModal');
+        }
+        
+        function printInvoice() {
+            generateInvoice();
+            
+            // Wait a bit for the modal to open, then trigger print
+            setTimeout(() => {
+                document.getElementById('printInvoiceModalBtn').click();
+            }, 500);
+        }
+        
+        // Transaction functions
+        function viewTransaction(id) {
+            alert(`Viewing transaction #TX-${id.toString().padStart(4, '0')}`);
+            // In a real app, you would open a modal with transaction details
+        }
+        
+        function markAsPaid(id) {
+            if (confirm('Mark this transaction as paid?')) {
+                alert(`Transaction #TX-${id.toString().padStart(4, '0')} marked as paid!`);
+                // In a real app, you would update the transaction status via API
+                initTransactionTables(); // Refresh the table
+            }
+        }
+        
+        function printTransaction(id) {
+            alert(`Printing transaction #TX-${id.toString().padStart(4, '0')}`);
+            // In a real app, you would generate and print the transaction invoice
+        }
+        
+        // Report functions
+        function generateReport() {
+            const reportType = document.getElementById('reportType').value;
+            const reportPeriod = document.getElementById('reportPeriod').value;
+            
+            let reportTitle = '';
+            let reportHeaders = [];
+            let reportData = [];
+            
+            // Generate sample report data based on type
+            switch(reportType) {
+                case 'sales':
+                    reportTitle = 'Sales Report';
+                    reportHeaders = ['Date', 'Invoice No', 'Customer', 'Products', 'Amount', 'Status'];
+                    reportData = [
+                        ['12 May 2023', 'INV-001', 'Rahul Sharma', 'Laptop, Headphones', '₹8,450', 'Paid'],
+                        ['11 May 2023', 'INV-002', 'Priya Patel', 'Shirt, Blender', '₹12,500', 'Pending'],
+                        ['10 May 2023', 'INV-003', 'Anil Kumar', 'JavaScript Book', '₹5,250', 'Paid'],
+                        ['9 May 2023', 'INV-004', 'Sneha Singh', 'Headphones, Shirt', '₹9,800', 'Paid'],
+                        ['8 May 2023', 'INV-005', 'Vikram Mehta', 'Laptop', '₹15,200', 'Pending']
+                    ];
+                    break;
+                    
+                case 'inventory':
+                    reportTitle = 'Inventory Report';
+                    reportHeaders = ['Product ID', 'Product Name', 'Category', 'Price', 'Quantity', 'Status'];
+                    reportData = [
+                        ['PROD-0001', 'Laptop Dell XPS 13', 'Electronics', '₹85,000', '12', 'In Stock'],
+                        ['PROD-0002', 'Wireless Headphones', 'Electronics', '₹3,500', '25', 'In Stock'],
+                        ['PROD-0003', 'Men\'s Casual Shirt', 'Clothing', '₹1,200', '45', 'In Stock'],
+                        ['PROD-0004', 'Kitchen Blender', 'Home & Kitchen', '₹2,500', '8', 'Low Stock'],
+                        ['PROD-0005', 'JavaScript Book', 'Books', '₹450', '32', 'In Stock']
+                    ];
+                    break;
+                    
+                case 'transactions':
+                    reportTitle = 'Transaction Report';
+                    reportHeaders = ['Transaction ID', 'Customer', 'Date', 'Amount', 'Payment Status', 'Due Date'];
+                    reportData = [
+                        ['TX-7821', 'Rahul Sharma', '12 May 2023', '₹8,450', 'Paid', '-'],
+                        ['TX-7820', 'Priya Patel', '11 May 2023', '₹12,500', 'Pending', '15 May 2023'],
+                        ['TX-7819', 'Anil Kumar', '10 May 2023', '₹5,250', 'Paid', '-'],
+                        ['TX-7818', 'Sneha Singh', '9 May 2023', '₹9,800', 'Paid', '-'],
+                        ['TX-7817', 'Vikram Mehta', '8 May 2023', '₹15,200', 'Pending', '18 May 2023']
+                    ];
+                    break;
+                    
+                case 'profit':
+                    reportTitle = 'Profit & Loss Report';
+                    reportHeaders = ['Month', 'Revenue', 'Cost of Goods', 'Expenses', 'Profit'];
+                    reportData = [
+                        ['January', '₹85,000', '₹45,000', '₹15,000', '₹25,000'],
+                        ['February', '₹92,000', '₹48,000', '₹16,000', '₹28,000'],
+                        ['March', '₹78,000', '₹40,000', '₹14,000', '₹24,000'],
+                        ['April', '₹95,000', '₹50,000', '₹17,000', '₹28,000'],
+                        ['May', '₹1,10,000', '₹55,000', '₹18,000', '₹37,000']
+                    ];
+                    break;
+            }
+            
+            // Add period to title
+            if (reportPeriod !== 'custom') {
+                reportTitle += ` - ${reportPeriod.charAt(0).toUpperCase() + reportPeriod.slice(1)}`;
+            } else {
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+                if (startDate && endDate) {
+                    reportTitle += ` - ${startDate} to ${endDate}`;
+                }
+            }
+            
+            // Generate report table
+            let tableHtml = `
+                <thead>
+                    <tr>
+            `;
+            
+            reportHeaders.forEach(header => {
+                tableHtml += `<th>${header}</th>`;
+            });
+            
+            tableHtml += `</tr></thead><tbody>`;
+            
+            reportData.forEach(row => {
+                tableHtml += `<tr>`;
+                row.forEach(cell => {
+                    tableHtml += `<td>${cell}</td>`;
+                });
+                tableHtml += `</tr>`;
+            });
+            
+            tableHtml += `</tbody>`;
+            
+            // Update report display
+            document.getElementById('reportTitle').textContent = reportTitle;
+            document.getElementById('reportTable').innerHTML = tableHtml;
+            document.getElementById('reportPreview').style.display = 'block';
+            
+            // Scroll to report preview
+            document.getElementById('reportPreview').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        };
+    </script>
+</body>
+</html>
